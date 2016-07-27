@@ -1,6 +1,6 @@
-# waterexp
+# Chrome-exps
 
-A repository for hosting (hopefully several) interactive JS water experiments. You need a [Chrome](http://www.google.cl/chrome/browser/desktop/index.html) like browser to make it work :).
+A repository for hosting (hopefully several) interactive chrome experiments. You need a [Chrome](http://www.google.cl/chrome/browser/desktop/index.html) like browser to make it work :).
 
 
 ## [Diffuse](https://jgalazm.github.io/diffuse.html)
