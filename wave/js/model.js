@@ -14,7 +14,7 @@ var mTextureBuffer1, mTextureBuffer2, mTextureBufferClone, initTextureBuffer;
 var screenMaterial, modelMaterial, initialMaterial;
 
 //interactivity
-var speed = 1;
+var speed = 4;
 var mouse, mouseDown=false, rightClick=false;
 
 
@@ -124,7 +124,7 @@ function createMaterials(){
 		heatSourceSign: {type: "f", value:1},
 		heatIntensity: {type: "f", value:600},
 		brushWidth: {type: "f", value:0.1},
-		pause: {type: 'i', value:1},
+		pause: {type: 'i', value:0},
 		lightPos: {type: "v3", value:new THREE.Vector3(1.0,1.0,1.0)}
 	};
 	
@@ -332,10 +332,10 @@ function diffuseControls(){
 	this.bc = (mUniforms.boundaryCondition.value == 0) ? "fixed value" : "closed";
 	this.brushWidth = mUniforms.brushWidth.value*100;
 	this.height = mUniforms.heatIntensity.value;
-	this.pause = function(){
-		var pauseval = mUniforms.pause.value;
-		 mUniforms.pause.value  = 1 - pauseval;
-	}
+	// this.pause = function(){
+	// 	var pauseval = mUniforms.pause.value;
+	// 	 mUniforms.pause.value  = 1 - pauseval;
+	// }
 	this.speed = speed;
 	this.clearScreen = function(){
 		var nx = Math.floor(planewidth/mUniforms.delta.value.x);
@@ -369,7 +369,7 @@ function initControls() {
     });  
 
     //pause
-    pauseControl = folderSimulation.add(controls, "pause").name('Start/Pause');
+    // pauseControl = folderSimulation.add(controls, "pause").name('Start/Pause');
 
     //clear screen control
 
@@ -381,15 +381,15 @@ function initControls() {
 
     //boundary condition
 
-    bcControl = folderSimulation.add(controls, "bc", ["fixed value", "closed"]).name("Boundaries");
-    bcControl.onChange(function(value){
-    	if (value=="fixed value"){
-    		mUniforms.boundaryCondition.value = 0;
-    	}
-    	else if (value=="closed"){
-    		mUniforms.boundaryCondition.value = 1;
-    	}
-    })
+    // bcControl = folderSimulation.add(controls, "bc", ["fixed value", "closed"]).name("Boundaries");
+    // bcControl.onChange(function(value){
+    // 	if (value=="fixed value"){
+    // 		mUniforms.boundaryCondition.value = 0;
+    // 	}
+    // 	else if (value=="closed"){
+    // 		mUniforms.boundaryCondition.value = 1;
+    // 	}
+    // })
 
 
 
@@ -414,8 +414,8 @@ function initControls() {
     })
     // folders are open initially
     
-    folderSimulation.open();
-    folderExtSource.open();
+    // folderSimulation.open();
+    // folderExtSource.open();
 
     //own separate container
 
