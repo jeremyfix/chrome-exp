@@ -15,6 +15,9 @@
 		// 	var mFshader = 'shaders/modelFShader.glsl';
 		// 	var sFshader = 'shaders/screenFShader.glsl';		
 			$(function(){
+				//var c = document.getElementById( 'container' );
+				//c.width = window.innerWidth;
+				//c.height = window.innerHeight;
 				init();
 			});
 		</script>		
@@ -162,15 +165,20 @@
 
 			    gl_FragColor = vec4(pseudoColor.r, pseudoColor.g,pseudoColor.b, 1.0); 
 			}
-		</script>			
+		</script>		
+
+		<style>
+			body{overflow: hidden;}
+
+		</style>
 	</head>		
 
 	<body>
 			
-		<div id="simulation" style='display:inline-block;'>
-			<canvas id="container" style="width:1024px;height:512px;border:1px solid #d0d0d0;" ></canvas>
+		<div id="simulation" style="width:500px;height=300px" >
+			<canvas id="container" width = "500" height="300"></canvas>
 		</div>
-		<div id="controls" style='display:inline-block;'>
+		<div id="controls">
 		</div>	
 	</body>
 

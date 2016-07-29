@@ -1,7 +1,9 @@
 var container;
 var camera, scene, renderer;	
 
-var width, height, ratio=1;
+var planeWidth, planeHeight, 
+	screenWidth, screenHeight, 
+	simNx, simNy, ratio=1;
 var toggleBuffer = false;
 var planeScreen;
 
@@ -24,24 +26,25 @@ var mMap, initCondition = 1;
 //with url's of vertex/fragment shaders to work.
 //------------------------------------------------------
 function init(){
-	console.log('asdf');
-	width = Math.min(
-		window.innerWidth,
-		window.innerHeight)*0.95;
-	height = width*ratio;
+	// screenWidth = window.innerWidth;
+	// screenHeight = window.innerHeight;
+
 	
+
 	// container
 	simulationDiv = document.getElementById('simulation');
 	container = document.getElementById( 'container' );
-	container.width = width;
-	container.height = height;
+	// container.width = screenWidth;
+	// container.height = screenHeight;
+	screenWidth = container.width;
+	screenHeight = container.height;
 
-	info = document.createElement( 'div' );
-	info.style.position = 'absolute';
-	info.style.top = '10px';
-	info.style.width = '100%';
-	info.style.textAlign = 'center';
-	simulationDiv.appendChild( info );	
+	// info = document.createElement( 'div' );
+	// info.style.position = 'absolute';
+	// info.style.top = '10px';
+	// info.style.width = '100%';
+	// info.style.textAlign = 'center';
+	// simulationDiv.appendChild( info );	
 
 	//event handlers
 	container.onmousedown = onMouseDown;
@@ -65,18 +68,22 @@ function init(){
 	//renderer
 	renderer = new THREE.WebGLRenderer({canvas:container, preserveDrawingBuffer: true});
 	renderer.setClearColor( 0xa0a0a0 );
-	renderer.setSize(width, height);
+	renderer.setSize(screenWidth, screenHeight);
 
 	// camera
-	var camHeight = height;
-	var camWidth = width;
-
-	camera = new THREE.OrthographicCamera( -0.5, 0.5, 0.5, -0.5, - 500, 1000 );
+	planeWidth = 1.0;
+	planeHeight = planeWidth*screenHeight/screenWidth;
+	camera = new THREE.OrthographicCamera( -0.5*planeWidth, 
+											0.5*planeWidth,
+							 		0.5*planeHeight, -0.5*planeHeight,
+							 		-500, 1000 );
 	scene = new THREE.Scene();
 
 	// uniforms
+	simNx = 200;
+	simNy = simNx*screenHeight/screenWidth;
 	mUniforms = {
-		texel: {type: "v2", value: new THREE.Vector2(1/width,1/height)},
+		texel: {type: "v2", value: new THREE.Vector2(1/simNx,1/simNy)},
 		delta: {type:  "v2", value: undefined},
 		tSource: {type: "t", value: mMap},
 		colors: {type: "v4v", value: undefined},
@@ -85,7 +92,7 @@ function init(){
 		boundaryCondition: {type: "i", value:0},
 		heatSourceSign: {type: "f", value:1},
 		heatIntensity: {type: "f", value:100000},
-		brushWidth: {type: "f", value:110},
+		brushWidth: {type: "f", value:40},
 		pause: {type: 'i', value:0}
 	};
 
@@ -118,7 +125,8 @@ function init(){
 	});
 
 	//create plane geometry
-	var geometry = new THREE.PlaneGeometry(1.0 , 1.0);
+
+	var geometry = new THREE.PlaneGeometry(planeWidth , planeHeight);
 	planeScreen = new THREE.Mesh( geometry, screenMaterial );
 	scene.add( planeScreen );	
 
@@ -152,7 +160,7 @@ function runSimulation(initial_condition){
 
 	//create simulation buffers
 
-	resizeSimulation(256,256*ratio);
+	resizeSimulation(simNx,simNy);
 
 	//add GUI controls
 
@@ -266,7 +274,8 @@ function onMouseMove(e){
 	mousey = ev.pageY - simulation.offsetTop;
 
 	if (mouseDown){
-		mUniforms.mouse.value = new THREE.Vector2(mousex/width,1-mousey/height);
+		mUniforms.mouse.value = new THREE.Vector2(mousex/screenWidth,
+							1-mousey/screenHeight);
 	}
 }
 function onMouseDown(e){
@@ -278,7 +287,8 @@ function onMouseDown(e){
 	else {
 		mUniforms.heatSourceSign.value =  1;
 	}
-	mUniforms.mouse.value = new THREE.Vector2(mousex/width,1-mousey/height);
+	mUniforms.mouse.value = new THREE.Vector2(mousex/screenWidth,
+								1-mousey/screenHeight);
 }
 
 function onMouseUp(e){
@@ -299,7 +309,8 @@ function onTouchStart(e) {
 
 	mouseDown = true;
 	mUniforms.mouseDown.value = 1;
-	mUniforms.mouse.value = new THREE.Vector2(mousex/width,1-mousey/height);
+	mUniforms.mouse.value = new THREE.Vector2(mousex/screenWidth,
+							1-mousey/screenHeight);
 }
 
 function onTouchMove(e) {
@@ -309,7 +320,8 @@ function onTouchMove(e) {
     mousey = ev.targetTouches[0].pageY - simulation.offsetTop;
 
 	if (mouseDown){
-		mUniforms.mouse.value = new THREE.Vector2(mousex/width,1-mousey/height);
+		mUniforms.mouse.value = new THREE.Vector2(mousex/screenWidth,
+							1-mousey/screenHeight);
 	}
 }
 
@@ -350,7 +362,7 @@ function diffuseControls(){
 function initControls() {
     var controls = new diffuseControls;
     var gui = new dat.GUI({
-        autoPlace: false
+        autoPlace: true
     }); 
 
 
@@ -431,8 +443,8 @@ function initControls() {
 
     //own separate container
 
-    var customContainer = document.getElementById('controls');
-    customContainer.appendChild(gui.domElement);
+    // var customContainer = document.getElementById('controls');
+    // customContainer.appendChild(gui.domElement);
 }
 
 function snapshot(){
