@@ -18,7 +18,7 @@ var screenMaterial, modelMaterial, initialMaterial;
 var imagen;
 
 
-
+var oldScreenWidth, oldScreenHeight;
 var mMap, initCondition = 1;
 
 //------------------------------------------------------
@@ -270,8 +270,8 @@ function setColorMap(cmap){
 function onMouseMove(e){
 	var ev = e ? e : window.event;
 
-	mousex = ev.pageX - simulation.offsetLeft;
-	mousey = ev.pageY - simulation.offsetTop;
+	mousex = ev.pageX - simulation.offsetLeft*0.0;
+	mousey = ev.pageY - simulation.offsetTop*0.0;
 
 	if (mouseDown){
 		mUniforms.mouse.value = new THREE.Vector2(mousex/screenWidth,
@@ -287,6 +287,7 @@ function onMouseDown(e){
 	else {
 		mUniforms.heatSourceSign.value =  1;
 	}
+	console.log(mousex);
 	mUniforms.mouse.value = new THREE.Vector2(mousex/screenWidth,
 								1-mousey/screenHeight);
 }
@@ -348,7 +349,11 @@ function diffuseControls(){
 	this.pause = function(){
 		var pauseval = mUniforms.pause.value;
 		 mUniforms.pause.value  = 1 - pauseval;
-	}
+	};
+	this.fullscreen = function(){
+		fullscreen();
+	};
+
 	this.speed = speed;
 	this.clearScreen = function(){
 		var nx = Math.floor(1/mUniforms.delta.value.x);
@@ -392,7 +397,9 @@ function initControls() {
 
  	snapshotControl = folderGeneral.add(controls, "snapshot").name("Snapshot");
 
+ 	//fullscreen
 
+ 	fscreenControl = folderGeneral.add(controls, "fullscreen");
     // Scene (colormap)
 
     sceneControl = folderSimulation.add(controls, "scene",
@@ -452,6 +459,46 @@ function snapshot(){
 	window.open(dataURL, "diffuse-"+Math.random());
 }	
 
+
+function fullscreen(){
+           var el = document.getElementById('container');
+ 
+           if(el.webkitRequestFullScreen) {
+               el.webkitRequestFullScreen();
+           }
+          else {
+             el.mozRequestFullScreen();
+          }            
+          renderer.setSize(screen.width,
+          	screen.height);
+
+                  // scroll to upper left corner
+        // $('html, body').scrollTop(canv.offset().top);
+        // $('html, body').scrollLeft(canv.offset().left);
+}
+ 
+
+
+
+function isFullScreen(){
+    return document.mozFullScreenElement ||
+        document.webkitCurrentFullScreenElement ||
+        document.fullscreenElement;
+}
+window.onresize = function(event) {
+	    if (isFullScreen()){
+	    	oldScreenWidth = screenWidth;
+	    	oldScreenHeight = screenHeight;
+	    	screenWidth = screen.width;
+	    	screenHeight = screen.height;
+
+	    }
+	    else{
+	    	screenWidth = oldScreenWidth;
+	    	screenHeight = oldScreenHeight;
+
+	    }
+};
 //defaults
 
 //res 256
