@@ -1,8 +1,8 @@
 var container;
-var camera, scene, renderer;	
+var camera, scene, renderer;
 
-var planeWidth, planeHeight, 
-	screenWidth, screenHeight, 
+var planeWidth, planeHeight,
+	screenWidth, screenHeight,
 	simNx, simNy, ratio=1;
 var toggleBuffer = false;
 var planeScreen;
@@ -29,7 +29,7 @@ function init(){
 	// screenWidth = window.innerWidth;
 	// screenHeight = window.innerHeight;
 
-	
+
 
 	// container
 	simulationDiv = document.getElementById('simulation');
@@ -44,7 +44,7 @@ function init(){
 	// info.style.top = '10px';
 	// info.style.width = '100%';
 	// info.style.textAlign = 'center';
-	// simulationDiv.appendChild( info );	
+	// simulationDiv.appendChild( info );
 
 	//event handlers
 	container.onmousedown = onMouseDown;
@@ -54,7 +54,7 @@ function init(){
 	container.onkeypress = onKeyPress;
     container.addEventListener("touchstart", onTouchStart, false);
     container.addEventListener("touchmove", onTouchMove, false);
-    container.addEventListener("touchend", onTouchEnd, false);	
+    container.addEventListener("touchend", onTouchEnd, false);
 	container.oncontextmenu = function(){return false};
 
 	  $(document).keyup(function(evt) {
@@ -73,7 +73,7 @@ function init(){
 	// camera
 	planeWidth = 1.0;
 	planeHeight = planeWidth*screenHeight/screenWidth;
-	camera = new THREE.OrthographicCamera( -0.5*planeWidth, 
+	camera = new THREE.OrthographicCamera( -0.5*planeWidth,
 											0.5*planeWidth,
 							 		0.5*planeHeight, -0.5*planeHeight,
 							 		-500, 1000 );
@@ -100,58 +100,31 @@ function init(){
 	// create material
 	initialMaterial = new THREE.ShaderMaterial({
 		uniforms: mUniforms,
-		// vertexShader: $.ajax(vshader, {async:false}).responseText,
-		// fragmentShader: $.ajax(iFshader,{async:false}).responseText
-		vertexShader: document.getElementById('vshader').textContent,
-		fragmentShader: document.getElementById('iFshader').textContent,
+		vertexShader: $.ajax(vshader, {async:false}).responseText,
+		fragmentShader: $.ajax(iFshader,{async:false}).responseText
 	});
 
 	modelMaterial = new THREE.ShaderMaterial({
 		uniforms: mUniforms,
-		// vertexShader: $.ajax(vshader, {async:false}).responseText,
-		// fragmentShader: $.ajax(mFshader,{async:false}).responseText
-		vertexShader: document.getElementById('vshader').textContent,
-		fragmentShader: document.getElementById('mFshader').textContent,
-
+		vertexShader: $.ajax(vshader, {async:false}).responseText,
+		fragmentShader: $.ajax(mFshader,{async:false}).responseText
 	});
 
 	screenMaterial = new THREE.ShaderMaterial({
 		uniforms: mUniforms,
-		// vertexShader: $.ajax(vshader,{async:false}).responseText,
-		// fragmentShader: $.ajax(sFshader,{async:false}).responseText
-		vertexShader: document.getElementById('vshader').textContent,
-		fragmentShader: document.getElementById('sFshader').textContent,
-
+		vertexShader: $.ajax(vshader,{async:false}).responseText,
+		fragmentShader: $.ajax(sFshader,{async:false}).responseText
 	});
 
 	//create plane geometry
 
 	var geometry = new THREE.PlaneGeometry(planeWidth , planeHeight);
 	planeScreen = new THREE.Mesh( geometry, screenMaterial );
-	scene.add( planeScreen );	
+	scene.add( planeScreen );
 
 	//default colormap
 	setColorMap('heat');
- 
 
-	// Load the simulation
-	// var loader = new THREE.ImageLoader();
-	// loader.load(
-	// 	// resource URL
-	// 	"img/diffuse1.png",
-	// 	// Function when resource is loaded
-	// 	function ( image ) {			
-	// 		runSimulation(image);
-	// 	},
-	// 	// Function called when download progresses
-	// 	function ( xhr ) {
-	// 		console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
-	// 	},
-	// 	// Function called when download errors
-	// 	function ( xhr ) {
-	// 		console.log( 'An error happened' );
-	// 	}
-	// );
 	runSimulation();
 
 }
@@ -191,16 +164,16 @@ function runSimulation(initial_condition){
 function resizeSimulation(nx,ny){
 
 	mUniforms.delta.value = new THREE.Vector2(1/nx,1/ny);
-	
+
 	// create buffers
 	if (!mTextureBuffer1){
 
-	mTextureBuffer1 = new THREE.WebGLRenderTarget( nx, ny, 
+	mTextureBuffer1 = new THREE.WebGLRenderTarget( nx, ny,
 		 					{minFilter: THREE.LinearFilter,
 	                         magFilter: THREE.LinearFilter,
 	                         format: THREE.RGBAFormat,
 	                         type: THREE.FloatType});
-	mTextureBuffer2 = new THREE.WebGLRenderTarget( nx, ny, 
+	mTextureBuffer2 = new THREE.WebGLRenderTarget( nx, ny,
 		 					{minFilter: THREE.LinearFilter,
 	                         magFilter: THREE.LinearFilter,
 	                         format: THREE.RGBAFormat,
@@ -214,22 +187,22 @@ function resizeSimulation(nx,ny){
 	else{
 		if (!toggleBuffer){
 			mTextureBuffer1.setSize(nx,ny);
-		}	
-		else{
-			mTextureBuffer2.setSize(nx,ny);	
 		}
-	
+		else{
+			mTextureBuffer2.setSize(nx,ny);
+		}
+
 	}
 
 }
-function renderSimulation(){	
+function renderSimulation(){
 
 	planeScreen.material = modelMaterial;
 	for (var i=0; i<Math.floor(speed); i++){
 		if (!toggleBuffer){
-			mUniforms.tSource.value = mTextureBuffer1;		
+			mUniforms.tSource.value = mTextureBuffer1;
 			renderer.render(scene, camera, mTextureBuffer2, true);
-			mUniforms.tSource.value = mTextureBuffer2;		
+			mUniforms.tSource.value = mTextureBuffer2;
 		}
 		else{
 			mUniforms.tSource.value = mTextureBuffer2;
@@ -240,7 +213,7 @@ function renderSimulation(){
 		toggleBuffer = !toggleBuffer;
 	}
 	planeScreen.material = screenMaterial;
-	renderer.render(scene,camera);			
+	renderer.render(scene,camera);
 	requestAnimationFrame(renderSimulation);
 }
 
@@ -252,16 +225,16 @@ function setColorMap(cmap){
 				new THREE.Vector4(0, 0, 1, -3.3),
 				new THREE.Vector4(0, 0, 0, 0.0),
 				new THREE.Vector4(1, 0, 0, 3.3),
-				new THREE.Vector4(1, 1, 0, 6.6),	
+				new THREE.Vector4(1, 1, 0, 6.6),
 				new THREE.Vector4(1, 1, 1, 9.9)];
-	}	
+	}
 	else if (cmap=='blueInk'){
 		colors = [new THREE.Vector4(1, 1, 1, 0),
 				new THREE.Vector4(0, 0, 1, 5.0),
 				new THREE.Vector4(0, 0, 1, 10.0),
 				new THREE.Vector4(0, 0, 1, 10.0),
 				new THREE.Vector4(0, 0, 1, 10.0),
-				new THREE.Vector4(0, 0, 1, 10.0),	
+				new THREE.Vector4(0, 0, 1, 10.0),
 				new THREE.Vector4(0, 0, 1, 10.0),];
 	}
 
@@ -337,7 +310,7 @@ function onKeyPress(e){
    }
    if(e.keyCode == 32){
        console.log('asdf');
-   }	
+   }
 }
 
 function diffuseControls(){
@@ -368,12 +341,12 @@ function initControls() {
     var controls = new diffuseControls;
     var gui = new dat.GUI({
         autoPlace: true
-    }); 
+    });
 
 
 
     //folders
-    
+
     var folderSimulation = gui.addFolder('Simulation');
     var folderGeneral = gui.addFolder('General Controls');
     var folderExtSource = gui.addFolder('External Source');
@@ -383,8 +356,8 @@ function initControls() {
     speedControl = folderGeneral.add(controls, "speed", 1, 20).name('Speed');
     speedControl.onChange(function(value){
     	speed = Math.floor(value);
-    });  
-        
+    });
+
     //pause
     pauseControl = folderGeneral.add(controls, "pause").name('Start/Pause');
 
@@ -443,7 +416,7 @@ function initControls() {
 
 
     // folders are open initially
-    
+
     folderGeneral.open();
     folderSimulation.open();
     folderExtSource.open();
@@ -457,18 +430,18 @@ function initControls() {
 function snapshot(){
 	var dataURL = container.toDataURL("image/png");
 	window.open(dataURL, "diffuse-"+Math.random());
-}	
+}
 
 
 function fullscreen(){
            var el = document.getElementById('container');
- 
+
            if(el.webkitRequestFullScreen) {
                el.webkitRequestFullScreen();
            }
           else {
              el.mozRequestFullScreen();
-          }            
+          }
           renderer.setSize(screen.width,
           	screen.height);
 
@@ -476,7 +449,7 @@ function fullscreen(){
         // $('html, body').scrollTop(canv.offset().top);
         // $('html, body').scrollLeft(canv.offset().left);
 }
- 
+
 
 
 
