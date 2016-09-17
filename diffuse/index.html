@@ -11,6 +11,7 @@
 		<script src="js/ui.js"></script>
 		<script src="js/model.js"></script>
 		<script src="js/diffuse.js"></script>
+		<script src="js/Lut.js"></script>
 		<script>
 			$(function(){
 				c = document.getElementById( 'container' );
@@ -22,18 +23,6 @@
 					'shaders/initFShader.glsl',
 					'shaders/modelFShader.glsl',
 				'shaders/screenFShader.glsl');
-
-				// d1.vshader = 'shaders/vshader.glsl';
-				// d1.iFshader = 'shaders/initFShader.glsl';
-				// d1.mFshader = 'shaders/modelFShader.glsl';
-				// d1.sFshader = 'shaders/screenFShader.glsl';
-
-				// d1.vshader = $.ajax('shaders/vshader.glsl',{async:false}).responseText;
-				// d1.iFshader = $.ajax('shaders/iFshader.glsl',{async:false}).responseText;
-				// d1.mFshader = $.ajax('shaders/mFshader.glsl',{async:false}).responseText;
-				// d1.sFshader = $.ajax('shaders/sFshader.glsl',{async:false}).responseText;
-				//
-
 				d1.start();
 			});
 		</script>
@@ -50,7 +39,6 @@
 	</head>
 
 	<body>
-
 		<div id="simulation" style="width:500px;height=300px" >
 			<canvas id="container" width = "500" height="300"></canvas>
 		</div>

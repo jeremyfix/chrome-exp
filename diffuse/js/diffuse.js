@@ -3,6 +3,9 @@ var Diffuse = function(container, vshader, iFshader, mFshader, sFshader){
   this.width = container.width;
   this.height = container.height;
 
+  // for handling events
+  this.mouseDown = false;
+
   // shaders
   this.vshader = vshader;
   this.iFshader = iFshader;
@@ -223,6 +226,45 @@ var Diffuse = function(container, vshader, iFshader, mFshader, sFshader){
     );
   };
 
+  this.onMouseMove = function(e){
+    var ev = e ? e : this.container.event;
+
+    this.mousex = ev.pageX - this.container.offsetLeft;
+    this.mousey = ev.pageY - this.container.offsetTop;
+
+    if (this.mouseDown){
+      this.simulation.uniforms.mouse.value =
+      new THREE.Vector2(this.mousex/this.width,1-this.mousey/this.height);
+    }
+  }
+
+  this.onMouseDown = function(e){
+    var ev = e ? e: window.event;
+    ev.preventDefault();
+  	this.mouseDown = true;
+  	this.simulation.uniforms.mouseDown.value = 1;
+  	if (e.which == 3){
+  		this.simulation.uniforms.heatSourceSign.value = -1;
+  	}
+  	else {
+  		this.simulation.uniforms.heatSourceSign.value =  1;
+  	}
+
+  	this.simulation.uniforms.mouse.value =
+      new THREE.Vector2(this.mousex/this.width,
+  								1-this.mousey/this.height);
+  }
+
+  this.onMouseUp = function(e){
+  	this.mouseDown = false;
+  	this.simulation.uniforms.mouseDown.value = 0;
+  }
+
+  this.onMouseOut = function(e){
+  	this.mouseDown = false;
+  	this.simulation.uniforms.mouseDown.value = 0;
+  }
+
 
   this.start = function(){
     this.setColormap("heat");
@@ -235,14 +277,11 @@ var Diffuse = function(container, vshader, iFshader, mFshader, sFshader){
 
     this.renderScreen();
 
+    this.container.onmousedown = this.onMouseDown.bind(this);
+    this.container.onmousemove = this.onMouseMove.bind(this);
+    this.container.onmouseup = this.onMouseUp.bind(this);
+    this.container.onmouseout = this.onMouseOut.bind(this);
+
     this.renderSimulation()
   };
 };
-
-
-//
-Diffuse.prototype.ui = {
-  start: function(){
-    console.log();
-  }
-}
