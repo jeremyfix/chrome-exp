@@ -8,17 +8,33 @@
 		<!--<script src="src/Three.js"></script>-->
 		<script src="js/jquery-1.11.3.min.js"></script>
 		<script src="js/dat.gui.min.js"></script>
+		<script src="js/ui.js"></script>
 		<script src="js/model.js"></script>
+		<script src="js/diffuse.js"></script>
 		<script>
-			var vshader = 'shaders/vshader.glsl';
-			var iFshader = 'shaders/initFShader.glsl';
-			var mFshader = 'shaders/modelFShader.glsl';
-			var sFshader = 'shaders/screenFShader.glsl';
 			$(function(){
-				var c = document.getElementById( 'container' );
-				c.width = window.innerWidth;
-				c.height = window.innerHeight;
-				init();
+				c = document.getElementById( 'container' );
+				// c.width = window.innerWidth;
+				// c.height = window.innerHeight;
+				// init();
+				d1 = new Diffuse(c,
+					'shaders/vshader.glsl',
+					'shaders/initFShader.glsl',
+					'shaders/modelFShader.glsl',
+				'shaders/screenFShader.glsl');
+
+				// d1.vshader = 'shaders/vshader.glsl';
+				// d1.iFshader = 'shaders/initFShader.glsl';
+				// d1.mFshader = 'shaders/modelFShader.glsl';
+				// d1.sFshader = 'shaders/screenFShader.glsl';
+
+				// d1.vshader = $.ajax('shaders/vshader.glsl',{async:false}).responseText;
+				// d1.iFshader = $.ajax('shaders/iFshader.glsl',{async:false}).responseText;
+				// d1.mFshader = $.ajax('shaders/mFshader.glsl',{async:false}).responseText;
+				// d1.sFshader = $.ajax('shaders/sFshader.glsl',{async:false}).responseText;
+				//
+
+				d1.start();
 			});
 		</script>
 

@@ -27,24 +27,12 @@ void main()
 			//anyway, everything is the same up to scaling by some space
 			//and time constants, so it does not really matter.
 		}
-	}		
+	}
 	if (pause == 0){
 		//boundaries
 		if (boundaryCondition == 0){
-			if (vUv.x <=delta.x){
-				gl_FragColor = vec4(0.0,0.0,0.0,1.0);
-				return;
-			}
-			else if (vUv.x >=1.0-delta.x){
-				gl_FragColor = vec4(0.0,0.0,0.0,1.0);
-				return;
-			}
-
-			if (vUv.y <=delta.y){
-				gl_FragColor = vec4(0.0,0.0,0.0,1.0);
-				return;
-			}
-			else if (vUv.y>=1.0-delta.y) {
+			if (vUv.x <=delta.x || vUv.x>=1.0-delta.x ||
+				vUv.y<=delta.y || vUv.y>=1.0-delta.y){
 				gl_FragColor = vec4(0.0,0.0,0.0,1.0);
 				return;
 			}
@@ -66,7 +54,7 @@ void main()
 			else if (vUv.y>=1.0-delta.y) {
 				gl_FragColor= vec4(u_ijm,0.0,0.0,1.0);
 				return;
-			}	
+			}
 		}
 		//interior: u^{n+1}
 		float u_np = u_ij;

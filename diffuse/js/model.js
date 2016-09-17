@@ -9,7 +9,6 @@ var planeScreen;
 
 var mousex, mousey, mouseDown=false, rightClick=false;
 
-var info
 var time=0;
 var speed = 15;
 
@@ -39,31 +38,11 @@ function init(){
 	screenWidth = container.width;
 	screenHeight = container.height;
 
-	// info = document.createElement( 'div' );
-	// info.style.position = 'absolute';
-	// info.style.top = '10px';
-	// info.style.width = '100%';
-	// info.style.textAlign = 'center';
-	// simulationDiv.appendChild( info );
-
 	//event handlers
 	container.onmousedown = onMouseDown;
 	container.onmouseup = onMouseUp;
 	container.onmousemove = onMouseMove;
 	container.onmouseout = onMouseOut;
-	container.onkeypress = onKeyPress;
-    container.addEventListener("touchstart", onTouchStart, false);
-    container.addEventListener("touchmove", onTouchMove, false);
-    container.addEventListener("touchend", onTouchEnd, false);
-	container.oncontextmenu = function(){return false};
-
-	  $(document).keyup(function(evt) {
-	    if (evt.keyCode == 80)
-	    	mUniforms.pause.value = 1 - mUniforms.pause.value;
-	    else if (evt.keyCode == 83)
-	    	snapshot();
-	  });
-
 
 	//renderer
 	renderer = new THREE.WebGLRenderer({canvas:container, preserveDrawingBuffer: true});
@@ -80,7 +59,7 @@ function init(){
 	scene = new THREE.Scene();
 
 	// uniforms
-	simNx = 200;
+	simNx = 256;
 	simNy = simNx*screenHeight/screenWidth;
 	mUniforms = {
 		texel: {type: "v2", value: new THREE.Vector2(1/simNx,1/simNy)},
@@ -137,15 +116,7 @@ function runSimulation(initial_condition){
 
 	//add GUI controls
 
-	initControls();
-
-	//set initial condition
-
-	// initTextureBuffer = new THREE.Texture(initial_condition);
- //    initTextureBuffer.wrapS = THREE.ClampToEdgeWrapping; // are these necessary?
- //    initTextureBuffer.wrapT = THREE.ClampToEdgeWrapping;
- //    initTextureBuffer.repeat.x = initTextureBuffer.repeat.y = 512;
- //    initTextureBuffer.needsUpdate = true; //this IS necessary
+	// initControls();
 
     //do the THING
 
@@ -193,8 +164,9 @@ function resizeSimulation(nx,ny){
 		}
 
 	}
-
 }
+
+
 function renderSimulation(){
 
 	planeScreen.material = modelMaterial;
@@ -235,246 +207,8 @@ function setColorMap(cmap){
 				new THREE.Vector4(0, 0, 1, 10.0),
 				new THREE.Vector4(0, 0, 1, 10.0),
 				new THREE.Vector4(0, 0, 1, 10.0),
-				new THREE.Vector4(0, 0, 1, 10.0),];
+				new THREE.Vector4(0, 0, 1, 10.0)];
 	}
 
 	mUniforms.colors.value = colors;
 }
-function onMouseMove(e){
-	var ev = e ? e : window.event;
-
-	mousex = ev.pageX - simulation.offsetLeft*0.0;
-	mousey = ev.pageY - simulation.offsetTop*0.0;
-
-	if (mouseDown){
-		mUniforms.mouse.value = new THREE.Vector2(mousex/screenWidth,
-							1-mousey/screenHeight);
-	}
-}
-function onMouseDown(e){
-	mouseDown = true;
-	mUniforms.mouseDown.value = 1;
-	if (e.which == 3){
-		mUniforms.heatSourceSign.value = -1;
-	}
-	else {
-		mUniforms.heatSourceSign.value =  1;
-	}
-	console.log(mousex);
-	mUniforms.mouse.value = new THREE.Vector2(mousex/screenWidth,
-								1-mousey/screenHeight);
-}
-
-function onMouseUp(e){
-	mouseDown = false;
-	mUniforms.mouseDown.value = 0;
-}
-
-function onMouseOut(e){
-	mouseDown = false;
-	mUniforms.mouseDown.value = 0;
-}
-
-function onTouchStart(e) {
-    var ev = e ? e : window.event;
-    e.preventDefault();
-    mousex = ev.targetTouches[0].pageX - simulation.offsetLeft;
-    mousey = ev.targetTouches[0].pageY - simulation.offsetTop;
-
-	mouseDown = true;
-	mUniforms.mouseDown.value = 1;
-	mUniforms.mouse.value = new THREE.Vector2(mousex/screenWidth,
-							1-mousey/screenHeight);
-}
-
-function onTouchMove(e) {
-    var ev = e ? e : window.event;
-    e.preventDefault();
-    mousex = ev.targetTouches[0].pageX - simulation.offsetLeft;
-    mousey = ev.targetTouches[0].pageY - simulation.offsetTop;
-
-	if (mouseDown){
-		mUniforms.mouse.value = new THREE.Vector2(mousex/screenWidth,
-							1-mousey/screenHeight);
-	}
-}
-
-function onTouchEnd(e) {
-	mouseDown = false;
-	mUniforms.mouseDown.value = 0;
-}
-
-function onKeyPress(e){
-   if(e.keyCode == 8){
-       console.log('backspace');
-   }
-   if(e.keyCode == 32){
-       console.log('asdf');
-   }
-}
-
-function diffuseControls(){
-	this.scene = "heat";
-	this.bc = (mUniforms.boundaryCondition.value == 0) ? "fixed value" : "closed";
-	this.resolution = 1/mUniforms.delta.value.x;
-	this.brushWidth = mUniforms.brushWidth.value;
-	this.intensity = mUniforms.heatIntensity.value;
-	this.pause = function(){
-		var pauseval = mUniforms.pause.value;
-		 mUniforms.pause.value  = 1 - pauseval;
-	};
-	this.fullscreen = function(){
-		fullscreen();
-	};
-
-	this.speed = speed;
-	this.clearScreen = function(){
-		var nx = Math.floor(1/mUniforms.delta.value.x);
-		var ny = Math.floor(1/mUniforms.delta.value.y);
-		mTextureBuffer1 = undefined;
-		resizeSimulation(nx,ny);
-	}
-
-	this.snapshot = snapshot;
-}
-function initControls() {
-    var controls = new diffuseControls;
-    var gui = new dat.GUI({
-        autoPlace: true
-    });
-
-
-
-    //folders
-
-    var folderSimulation = gui.addFolder('Simulation');
-    var folderGeneral = gui.addFolder('General Controls');
-    var folderExtSource = gui.addFolder('External Source');
-
-
-    //speed
-    speedControl = folderGeneral.add(controls, "speed", 1, 20).name('Speed');
-    speedControl.onChange(function(value){
-    	speed = Math.floor(value);
-    });
-
-    //pause
-    pauseControl = folderGeneral.add(controls, "pause").name('Start/Pause');
-
-    //clear screen control
-
- 	clearControl = folderGeneral.add(controls, "clearScreen").name("Clear");
-
-
-    //snapshot control
-
- 	snapshotControl = folderGeneral.add(controls, "snapshot").name("Snapshot");
-
- 	//fullscreen
-
- 	fscreenControl = folderGeneral.add(controls, "fullscreen");
-    // Scene (colormap)
-
-    sceneControl = folderSimulation.add(controls, "scene",
-    	 ["blueInk", "heat"]).name("Scene");
-    sceneControl.onChange(setColorMap);
-
-    //boundary condition
-
-    bcControl = folderSimulation.add(controls, "bc", ["fixed value", "closed"]).name("Boundaries");
-    bcControl.onChange(function(value){
-    	if (value=="fixed value"){
-    		mUniforms.boundaryCondition.value = 0;
-    	}
-    	else if (value=="closed"){
-    		mUniforms.boundaryCondition.value = 1;
-    	}
-    })
-
-    //mesh resolution
-
-	resolutionControl = folderSimulation.add(controls, "resolution", 16, 512).name('Resolution');
-    resolutionControl.onChange(function(value){
-    	resizeSimulation(value,value*ratio);
-    	//resizeSimulation(value,value,1);
-    });
-
-
-    //brush
-
-    brushWidthControl = folderExtSource.add(controls, "brushWidth", 8, 150).name('Brush Width');
-    brushWidthControl.onChange(function(value){
-    	mUniforms.brushWidth.value = value;
-    });
-
-    //heat/concentration source intensity
-
-    heatIntensityControl = folderExtSource.add(controls, "intensity", 1, 200000).name('Intensity');
-    heatIntensityControl.onChange(function(value){
-    	mUniforms.heatIntensity.value = value;
-    });
-
-
-    // folders are open initially
-
-    folderGeneral.open();
-    folderSimulation.open();
-    folderExtSource.open();
-
-    //own separate container
-
-    // var customContainer = document.getElementById('controls');
-    // customContainer.appendChild(gui.domElement);
-}
-
-function snapshot(){
-	var dataURL = container.toDataURL("image/png");
-	window.open(dataURL, "diffuse-"+Math.random());
-}
-
-
-function fullscreen(){
-           var el = document.getElementById('container');
-
-           if(el.webkitRequestFullScreen) {
-               el.webkitRequestFullScreen();
-           }
-          else {
-             el.mozRequestFullScreen();
-          }
-          renderer.setSize(screen.width,
-          	screen.height);
-
-                  // scroll to upper left corner
-        // $('html, body').scrollTop(canv.offset().top);
-        // $('html, body').scrollLeft(canv.offset().left);
-}
-
-
-
-
-function isFullScreen(){
-    return document.mozFullScreenElement ||
-        document.webkitCurrentFullScreenElement ||
-        document.fullscreenElement;
-}
-window.onresize = function(event) {
-	    if (isFullScreen()){
-	    	oldScreenWidth = screenWidth;
-	    	oldScreenHeight = screenHeight;
-	    	screenWidth = screen.width;
-	    	screenHeight = screen.height;
-
-	    }
-	    else{
-	    	screenWidth = oldScreenWidth;
-	    	screenHeight = oldScreenHeight;
-
-	    }
-};
-//defaults
-
-//res 256
-//speed 6.2
-//brush width 0.23
-//intensity 0.05
