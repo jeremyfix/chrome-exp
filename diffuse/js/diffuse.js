@@ -295,7 +295,7 @@ var Diffuse = function(container, shaders){
       this.controls.onFullScreenChange, false);
     document.addEventListener("mozfullscreenchange", 
       this.controls.onFullScreenChange, false);
-
+      
     this.renderSimulation()
   };
 };
@@ -340,3 +340,27 @@ var SimulationControls = function(diffuse){
   }
 }
 
+
+var datguiControls = function(diffuse){
+	this.pause = diffuse.controls.pause;
+	this.fullscreen = diffuse.controls.fullscreen;
+}
+
+var initControls = function(diffuse) {
+    diffuse.datguiControls = new datguiControls(diffuse);
+    diffuse.datgui = new dat.GUI({
+        autoPlace: true
+    });
+
+    //pause
+    var pauseControl = diffuse.datgui.add(diffuse.datguiControls, "pause").name('Start/Pause');
+
+   	//fullscreen
+  
+   	var fscreenControl = diffuse.datgui.add(diffuse.datguiControls, "fullscreen");
+
+    //own separate container
+
+    // var customContainer = document.getElementById('controls');
+    // customContainer.appendChild(gui.domElement);
+}
