@@ -1,4 +1,4 @@
-var Diffuse = function(container, vshader, iFshader, mFshader, sFshader){
+var Diffuse = function(container, shaders){
   this.container = container;
   this.width = container.width;
   this.height = container.height;
@@ -7,10 +7,7 @@ var Diffuse = function(container, vshader, iFshader, mFshader, sFshader){
   this.mouseDown = false;
 
   // shaders
-  this.vshader = vshader;
-  this.iFshader = iFshader;
-  this.mFshader = mFshader;
-  this.sFshader = sFshader;
+  this.shaders = shaders;
 
   // renderer
   this.renderer = new THREE.WebGLRenderer({
@@ -33,6 +30,7 @@ var Diffuse = function(container, vshader, iFshader, mFshader, sFshader){
     ny: undefined,
     toggleBuffer1: false,
     speed : 1,
+    paused: false,
 
     uniforms : {
       texel: {
@@ -99,26 +97,26 @@ var Diffuse = function(container, vshader, iFshader, mFshader, sFshader){
   this.materials = {
     initialMaterial : new THREE.ShaderMaterial({
   		uniforms: this.simulation.uniforms,
-  		vertexShader: $.ajax(this.vshader,
+  		vertexShader: $.ajax(this.shaders.vshader,
         {async:false}).responseText,
-  		fragmentShader: $.ajax(this.iFshader,
+  		fragmentShader: $.ajax(this.shaders.iFshader,
         {async:false}).responseText
   	}),
 
   	modelMaterial : new THREE.ShaderMaterial({
   		uniforms: this.simulation.uniforms,
-  		vertexShader: $.ajax(this.vshader,
+  		vertexShader: $.ajax(this.shaders.vshader,
         {async:false}).responseText,
-  		fragmentShader: $.ajax(this.mFshader,
+  		fragmentShader: $.ajax(this.shaders.mFshader,
         {async:false}).responseText
   	}),
 
   	screenMaterial : new THREE.ShaderMaterial({
   		uniforms: this.simulation.uniforms,
   		vertexShader: $.ajax(
-        this.vshader,
+        this.shaders.vshader,
         {async:false}).responseText,
-  		fragmentShader: $.ajax(this.sFshader,
+  		fragmentShader: $.ajax(this.shaders.sFshader,
         {async:false}).responseText
   	})
   };
@@ -182,34 +180,37 @@ var Diffuse = function(container, vshader, iFshader, mFshader, sFshader){
   this.renderSimulation = function(){
     this.objects.planeScreen.material = this.materials.modelMaterial;
 
-    for (var i=0; i< Math.floor(this.simulation.speed*10);i++){
-      if(!this.simulation.toggleBuffer1){
-
-        this.simulation.uniforms.tSource.value =
-        this.simulation.mTextureBuffer1;
-
-        this.renderer.render(
-          this.scene,
-          this.camera,
-          this.simulation.mTextureBuffer2,
-          true
-        );
-      }
-      else{
-
-        this.simulation.uniforms.tSource.value =
-        this.simulation.mTextureBuffer2;
-
-        this.renderer.render(
-          this.scene,
-          this.camera,
-          this.simulation.mTextureBuffer1,
-          true
-        );
-      }
-
-      this.simulation.toggleBuffer1 = !this.simulation.toggleBuffer1;
+    if (!this.simulation.paused){
+      for (var i=0; i< Math.floor(this.simulation.speed*10);i++){
+        if(!this.simulation.toggleBuffer1){
+  
+          this.simulation.uniforms.tSource.value =
+          this.simulation.mTextureBuffer1;
+  
+          this.renderer.render(
+            this.scene,
+            this.camera,
+            this.simulation.mTextureBuffer2,
+            true
+          );
+        }
+        else{
+  
+          this.simulation.uniforms.tSource.value =
+          this.simulation.mTextureBuffer2;
+  
+          this.renderer.render(
+            this.scene,
+            this.camera,
+            this.simulation.mTextureBuffer1,
+            true
+          );
+        }
+  
+        this.simulation.toggleBuffer1 = !this.simulation.toggleBuffer1;
+      }      
     }
+
 
     this.renderScreen();
 

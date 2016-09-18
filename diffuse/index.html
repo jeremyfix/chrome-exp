@@ -11,18 +11,17 @@
 		<script src="js/ui.js"></script>
 		<script src="js/model.js"></script>
 		<script src="js/diffuse.js"></script>
-		<script src="js/Lut.js"></script>
 		<script>
+		var c1,d1,shaders;
 			$(function(){
-				c = document.getElementById( 'container' );
-				// c.width = window.innerWidth;
-				// c.height = window.innerHeight;
-				// init();
-				d1 = new Diffuse(c,
-					'shaders/vshader.glsl',
-					'shaders/initFShader.glsl',
-					'shaders/modelFShader.glsl',
-				'shaders/screenFShader.glsl');
+				c1 = document.getElementById( 'container' );
+				shaders = {
+					vshader: 'shaders/vshader.glsl',
+					iFshader: 'shaders/initFShader.glsl',
+					mFshader: 'shaders/modelFShader.glsl',
+					sFshader: 'shaders/screenFShader.glsl'
+				}
+				d1 = new Diffuse(c1,shaders);
 				d1.start();
 			});
 		</script>
@@ -41,6 +40,7 @@
 	<body>
 		<div id="simulation" style="width:500px;height=300px" >
 			<canvas id="container" width = "500" height="300"></canvas>
+			<canvas id="container2" width = "500" height="300"></canvas>
 		</div>
 		<div id="controls">
 		</div>
