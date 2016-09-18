@@ -2,10 +2,17 @@ var Diffuse = function(container, shaders){
   this.container = container;
   this.width = container.width;
   this.height = container.height;
-
+  
+  //for handling fullscreen event
+  this.width0 = container.width;
+  this.height0 = container.height;
+  
   // for handling events
   this.mouseDown = false;
-
+  
+  // ui controls
+  this.controls = new SimulationControls(this);
+  
   // shaders
   this.shaders = shaders;
 
@@ -237,7 +244,7 @@ var Diffuse = function(container, shaders){
       this.simulation.uniforms.mouse.value =
       new THREE.Vector2(this.mousex/this.width,1-this.mousey/this.height);
     }
-  }
+  };
 
   this.onMouseDown = function(e){
     var ev = e ? e: window.event;
@@ -254,19 +261,18 @@ var Diffuse = function(container, shaders){
   	this.simulation.uniforms.mouse.value =
       new THREE.Vector2(this.mousex/this.width,
   								1-this.mousey/this.height);
-  }
+  };
 
   this.onMouseUp = function(e){
   	this.mouseDown = false;
   	this.simulation.uniforms.mouseDown.value = 0;
-  }
+  };
 
   this.onMouseOut = function(e){
   	this.mouseDown = false;
   	this.simulation.uniforms.mouseDown.value = 0;
-  }
-
-
+  };
+  
   this.start = function(){
     this.setColormap("heat");
 
@@ -282,7 +288,55 @@ var Diffuse = function(container, shaders){
     this.container.onmousemove = this.onMouseMove.bind(this);
     this.container.onmouseup = this.onMouseUp.bind(this);
     this.container.onmouseout = this.onMouseOut.bind(this);
+    
+    document.addEventListener("fullscreenchange", 
+      this.controls.onFullScreenChange, false);
+    document.addEventListener("webkitfullscreenchange", 
+      this.controls.onFullScreenChange, false);
+    document.addEventListener("mozfullscreenchange", 
+      this.controls.onFullScreenChange, false);
 
     this.renderSimulation()
   };
 };
+
+var SimulationControls = function(diffuse){
+  this.pause = function(){
+    diffuse.simulation.paused = !diffuse.simulation.paused;
+  };
+  
+	this.snapshot = function(){
+		var dataURL = diffuse.container.toDataURL("image/png");
+		window.open(dataURL, "diffuse-"+Math.random());
+	};
+	
+	this.fullscreen = function(){
+    var el = diffuse.container;
+
+     if(el.webkitRequestFullScreen) {
+         el.webkitRequestFullScreen();
+     }
+    else {
+       el.mozRequestFullScreen();
+    }
+  };
+  
+  this.onFullScreenChange = function(){
+    var fullscreenElement = document.fullscreenElement ||
+      document.mozFullScreenElement || 
+      document.webkitFullscreenElement;
+    if (!fullscreenElement){
+      diffuse.width = diffuse.width0;
+      diffuse.height = diffuse.height0;
+      diffuse.renderer.setSize(diffuse.width,
+      diffuse.height);
+    }
+    else{
+      diffuse.renderer.setSize(screen.width,
+      	screen.height);
+      diffuse.width = screen.width;
+      diffuse.height = screen.height;      
+    }
+  }
+}
+
