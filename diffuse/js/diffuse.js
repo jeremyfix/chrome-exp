@@ -187,7 +187,7 @@ var Diffuse = function(container, shaders){
   this.renderSimulation = function(){
     this.objects.planeScreen.material = this.materials.modelMaterial;
 
-    if (!this.simulation.paused){
+    if (!this.simulation.paused || this.mouseDown){
       for (var i=0; i< Math.floor(this.simulation.speed*10);i++){
         if(!this.simulation.toggleBuffer1){
   
@@ -264,11 +264,15 @@ var Diffuse = function(container, shaders){
   };
 
   this.onMouseUp = function(e){
+    var ev = e ? e: window.event;
+    ev.preventDefault();
   	this.mouseDown = false;
   	this.simulation.uniforms.mouseDown.value = 0;
   };
 
   this.onMouseOut = function(e){
+    var ev = e ? e: window.event;
+    ev.preventDefault();
   	this.mouseDown = false;
   	this.simulation.uniforms.mouseDown.value = 0;
   };
@@ -303,9 +307,16 @@ var Diffuse = function(container, shaders){
 var SimulationControls = function(diffuse){
   this.pause = function(){
     diffuse.simulation.paused = !diffuse.simulation.paused;
+    diffuse.simulation.uniforms.pause.value = 1 - diffuse.simulation.uniforms.pause.value;
+    
   };
   
-	this.snapshot = function(){
+  this.clear = function(){
+    // diffuse.renderInitialCondition();
+    diffuse.simulation.setTextures();
+  }
+  
+	this.screenshot = function(){
 		var dataURL = diffuse.container.toDataURL("image/png");
 		window.open(dataURL, "diffuse-"+Math.random());
 	};
@@ -341,24 +352,31 @@ var SimulationControls = function(diffuse){
 }
 
 
-var datguiControls = function(diffuse){
+Diffuse.prototype.datguiControlsObject = function(diffuse){
 	this.pause = diffuse.controls.pause;
+	this.clear = diffuse.controls.clear;
 	this.fullscreen = diffuse.controls.fullscreen;
+	this.screenshot = diffuse.controls.screenshot;
 }
 
-var initControls = function(diffuse) {
-    diffuse.datguiControls = new datguiControls(diffuse);
+Diffuse.prototype.initDatguiControls = function(diffuse) {
+    diffuse.datguiControls = new diffuse.datguiControlsObject(diffuse);
     diffuse.datgui = new dat.GUI({
         autoPlace: true
     });
 
     //pause
     var pauseControl = diffuse.datgui.add(diffuse.datguiControls, "pause").name('Start/Pause');
+    
+    //clear
+    var clearControl = diffuse.datgui.add(diffuse.datguiControls, "clear").name('Clear');
 
    	//fullscreen
   
    	var fscreenControl = diffuse.datgui.add(diffuse.datguiControls, "fullscreen");
 
+    //screenshot
+    var screenshot = diffuse.datgui.add(diffuse.datguiControls, "screenshot").name('Screenshot');
     //own separate container
 
     // var customContainer = document.getElementById('controls');
