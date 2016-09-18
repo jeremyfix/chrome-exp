@@ -237,9 +237,9 @@ var Diffuse = function(container, shaders){
   this.onMouseMove = function(e){
     var ev = e ? e : this.container.event;
 
-    this.mousex = ev.pageX - this.container.offsetLeft;
-    this.mousey = ev.pageY - this.container.offsetTop;
-
+    this.mousex = ev.pageX -  $(this.container).offset().left;
+    this.mousey = ev.pageY - $(this.container).offset().top;
+  
     if (this.mouseDown){
       this.simulation.uniforms.mouse.value =
       new THREE.Vector2(this.mousex/this.width,1-this.mousey/this.height);
