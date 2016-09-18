@@ -162,7 +162,16 @@ var Diffuse = function(container, shaders){
     this.scene.add(this.objects.planeScreen);
   };
 
-
+  this.changeViewSize = function(width,height){
+    /*
+      el input width height deberia asegurar
+      q se mantenga la proporcion:
+      width/height = width0/height0
+    */
+    this.width0=this.width=this.container.width = width;
+    this.height0=this.height=this.container.height = height;
+    this.renderer.setSize(width,height);
+  }
   this.renderInitialCondition = function(){
 
     this.objects.planeScreen.material = this.materials.initialMaterial;
@@ -346,7 +355,9 @@ var SimulationControls = function(diffuse){
       diffuse.renderer.setSize(screen.width,
       	screen.height);
       diffuse.width = screen.width;
-      diffuse.height = screen.height;      
+      diffuse.height = Math.min(
+        screen.height, 
+        screen.width*diffuse.height0/diffuse.width0);      
     }
   }
 }
